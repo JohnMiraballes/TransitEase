@@ -1,23 +1,79 @@
-import { Tabs } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import * as React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { Ionicons } from '@expo/vector-icons'; // Importing the icon library
+import { StyleSheet } from "react-native";
 
-export default function TabsLayout() {
+// Import Screens
+import HomeScreen from "./home";
+import NavigationScreen from "./navigation";
+import AboutScreen from "./about";
+import InstructionScreen from "./InstructionScreen";
+import SettingsScreen from "./settings";
+import MapScreen from "./MapScreen";
+import AppsScreen from "./AppScreen";
+import TeamScreen from "./TeamScreen";
+
+// Create the stack navigator
+const Stack = createNativeStackNavigator();
+
+export default function App() {
   return (
-    <Tabs screenOptions={({ route }) => ({
-      tabBarIcon: ({ color, size }) => {
-        let iconName: keyof typeof Ionicons.glyphMap = "home"; // Set a default icon
-
-        if (route.name === "navigation") iconName = "map-outline";
-        else if (route.name === "settings") iconName = "settings-outline";
-        else if (route.name === "about") iconName = "information-circle-outline";
-
-        return <Ionicons name={iconName} size={size} color={color} />;
-      },
-    })}>
-      <Tabs.Screen name="home" options={{ title: "Home" }} />
-      <Tabs.Screen name="navigation" options={{ title: "Navigate" }} />
-      <Tabs.Screen name="settings" options={{ title: "Settings" }} />
-      <Tabs.Screen name="about" options={{ title: "About" }} />
-    </Tabs>
+    
+      <Stack.Navigator initialRouteName="home" screenOptions={{ headerStyle: styles.header, headerTitleStyle: styles.headerTitle }}>
+        {/* Home Screen */}
+        <Stack.Screen
+          name="home"
+          component={HomeScreen}
+          options={({ navigation }) => ({
+            headerLeft: () => (
+              <Ionicons
+                name="home-outline" // Home icon
+                size={24}
+                color="white"
+                style={{ marginLeft: 15 }}
+                onPress={() => navigation.navigate("home")}
+              />
+            ),
+            headerRight: () => (
+              <Ionicons
+                name="settings-outline" // Settings icon
+                size={24}
+                color="white"
+                style={{ marginRight: 15 }}
+                onPress={() => navigation.navigate("settings")}
+              />
+            ),
+          })}
+        />
+        {/* Navigation Screen */}
+        <Stack.Screen name="navigation" component={NavigationScreen} />
+        {/* About Screen */}
+        <Stack.Screen name="about" component={AboutScreen} />
+        {/* Instruction Screen */}
+        <Stack.Screen name="instruction" component={InstructionScreen} />
+        {/* Map Screen */}
+        <Stack.Screen name="map" component={MapScreen} />
+        {/* Settings Screen */}
+        <Stack.Screen name="settings" component={SettingsScreen} />
+        {/* Apps Screen */}
+        <Stack.Screen name="apps" component={AppsScreen} />
+        {/* Team Screen */}
+        <Stack.Screen name="team" component={TeamScreen} />
+      </Stack.Navigator>
+    
   );
 }
+
+// Simple Styles
+const styles = StyleSheet.create({
+  header: {
+    backgroundColor: "#4CAF50", // Green color for the header
+    height: 70, // Slightly taller header
+  },
+  headerTitle: {
+    fontWeight: "bold", // Bold font for the header title
+    color: "white", // White text for title
+    fontSize: 20, // Slightly larger title text
+  },
+});
