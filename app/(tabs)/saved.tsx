@@ -1,75 +1,98 @@
-// SavedPlacesScreen.tsx
+import React from "react";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const SavedPlacesScreen = () => {
-  const [homeLocation, setHomeLocation] = React.useState<{ latitude: number; longitude: number } | null>(null);
-  const [workLocation, setWorkLocation] = React.useState<{ latitude: number; longitude: number } | null>(null);
-
-  // Load saved locations from AsyncStorage
-  React.useEffect(() => {
-    const loadSavedLocations = async () => {
-      const home = await AsyncStorage.getItem('homeLocation');
-      const work = await AsyncStorage.getItem('workLocation');
-
-      if (home) setHomeLocation(JSON.parse(home));
-      if (work) setWorkLocation(JSON.parse(work));
-    };
-
-    loadSavedLocations();
-  }, []);
-
-  const clearLocation = async (type: 'home' | 'work') => {
-    await AsyncStorage.removeItem(`${type}Location`);
-    if (type === 'home') setHomeLocation(null);
-    if (type === 'work') setWorkLocation(null);
-  };
-
+const SavedScreen = ({ navigation }: any) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Saved Locations</Text>
+      {/* Header Section inside a White Background Container */}
+      <View style={styles.headerContainer}>
+        <View style={styles.header}>
+          {/* Back Button */}
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={24} color="black" />
+          </TouchableOpacity>
 
-      <View style={styles.locationItem}>
-        <Text style={styles.locationTitle}>Home:</Text>
-        {homeLocation ? (
-          <Text style={styles.locationText}>
-            {homeLocation.latitude.toFixed(4)}, {homeLocation.longitude.toFixed(4)}
-          </Text>
-        ) : (
-          <Text style={styles.locationText}>Not set</Text>
-        )}
-        <TouchableOpacity onPress={() => clearLocation('home')} style={styles.clearButton}>
-          <Text style={styles.clearButtonText}>Clear</Text>
+          {/* Title */}
+          <Text style={styles.headerText}>Saved Places</Text>
+        </View>
+      </View>
+
+      {/* Saved Places Options Container */}
+      <View style={styles.savedContainer}>
+        <TouchableOpacity style={styles.menuItem}>
+          <Ionicons name="home-outline" size={24} color="black" />
+          <Text style={styles.menuText}>Add Home</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.menuItem}>
+          <Ionicons name="briefcase-outline" size={24} color="black" />
+          <Text style={styles.menuText}>Add Work</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.menuItem}>
+          <Ionicons name="school-outline" size={24} color="black" />
+          <Text style={styles.menuText}>Add School</Text>
         </TouchableOpacity>
       </View>
 
-      <View style={styles.locationItem}>
-        <Text style={styles.locationTitle}>Work:</Text>
-        {workLocation ? (
-          <Text style={styles.locationText}>
-            {workLocation.latitude.toFixed(4)}, {workLocation.longitude.toFixed(4)}
-          </Text>
-        ) : (
-          <Text style={styles.locationText}>Not set</Text>
-        )}
-        <TouchableOpacity onPress={() => clearLocation('work')} style={styles.clearButton}>
-          <Text style={styles.clearButtonText}>Clear</Text>
+      {/* Add Another Place */}
+      <View style={styles.addPlaceContainer}>
+        <TouchableOpacity style={styles.addAnotherPlace}>
+          <Ionicons name="add-circle-outline" size={24} color="red" />
+          <Text style={[styles.menuText, { color: "red" }]}>Add Another Place</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Empty State Message */}
+      <Text style={styles.emptyMessage}>You don't have any saved places yet</Text>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#fff' },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
-  locationItem: { marginBottom: 20 },
-  locationTitle: { fontSize: 18, fontWeight: 'bold' },
-  locationText: { fontSize: 16, color: '#555' },
-  clearButton: { marginTop: 5, backgroundColor: '#FF6347', padding: 8, borderRadius: 5 },
-  clearButtonText: { color: '#fff', fontWeight: 'bold' },
+  container: { flex: 1, backgroundColor: "#F8F9FA" },
+  headerContainer: {
+    backgroundColor: "white",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 20,
+    position: "relative",
+  },
+  headerText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "center",
+    flex: 1,
+  },
+  savedContainer: {
+    backgroundColor: "white",
+    borderRadius: 10,
+    marginTop: 42,
+    paddingVertical: 5,
+  },
+  menuItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+  },
+  menuText: { fontSize: 16, marginLeft: 10 },
+  addPlaceContainer: {
+    backgroundColor: "white",
+    borderRadius: 10,
+    marginTop: 32,
+    paddingVertical: 5,
+  },
+  addAnotherPlace: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 15,
+  },
+  emptyMessage: { textAlign: "center", marginTop: 20, color: "#999" },
 });
 
-export default SavedPlacesScreen;
+export default SavedScreen;

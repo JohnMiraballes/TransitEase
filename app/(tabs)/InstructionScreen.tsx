@@ -1,9 +1,16 @@
 import React from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons"; // Import icons for the back button
 
-const InstructionScreen = () => (
+const InstructionScreen = ({ navigation }: any) => (
   <ScrollView style={styles.container}>
-    <Text style={styles.title}>How to Use the App</Text>
+    {/* Header Section with Back Button */}
+    <View style={styles.header}>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <Ionicons name="arrow-back" size={24} color="black" />
+      </TouchableOpacity>
+      <Text style={styles.title}>How to Use the App</Text>
+    </View>
 
     {/* Instructions for Home Screen */}
     <View style={styles.section}>
@@ -93,10 +100,21 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "#f0f0f0", // Light background for the instructions
   },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 42, // Space below the header
+  },
+  backButton: {
+    padding: 10,
+    position: "absolute",
+    left: 0,
+    zIndex: 1, // Ensure the button is clickable
+  },
   title: {
-    fontSize: 28,
+    flex: 1, // This makes the title take up all available space
+    fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 30,
     textAlign: "center",
   },
   section: {

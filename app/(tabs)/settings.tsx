@@ -1,44 +1,68 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Switch, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Switch, StyleSheet, Dimensions } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+
+// Get screen width for full-width header
+const screenWidth = Dimensions.get("window").width;
 
 const SettingsScreen = ({ navigation }: any) => {
   const [isStepFree, setIsStepFree] = useState(false);
 
-  const toggleStepFree = () => setIsStepFree((prev) => !prev);
-
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Settings</Text>
-
-      {/* Step-Free Routes Toggle */}
-      <View style={styles.settingCard}>
-        <Text style={styles.settingTitle}>Enable Step-Free Routes</Text>
-        <Switch value={isStepFree} onValueChange={toggleStepFree} />
+      {/* Header Section with Full Width */}
+      <View style={styles.headerContainer}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color="black" />
+          </TouchableOpacity>
+          <Text style={styles.headerText}>Setting</Text>
+        </View>
       </View>
 
-      {/* Navigate to Apps */}
-      <TouchableOpacity
-        style={styles.optionButton}
-        onPress={() => navigation.navigate("apps")}
-      >
-        <Text style={styles.optionText}>Apps</Text>
-      </TouchableOpacity>
+      {/* Step-Free Routes Toggle */}
+      <View style={styles.section}>
+        <Text style={styles.sectionText}>Enable Step-Free Routes</Text>
+        <Switch
+          value={isStepFree}
+          onValueChange={(value) => setIsStepFree(value)}
+        />
+      </View>
 
-      {/* Navigate to Instructions */}
-      <TouchableOpacity
-        style={styles.optionButton}
-        onPress={() => navigation.navigate("instruction")}
-      >
-        <Text style={styles.optionText}>Instructions</Text>
-      </TouchableOpacity>
+      {/* Accounts Section */}
+      <Text style={styles.sectionTitle}>Accounts</Text>
+      <View style={styles.box}>
+        <TouchableOpacity>
+          <Text style={styles.boxText}>Login</Text>
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <Text style={styles.boxText}>Sign up</Text>
+        </TouchableOpacity>
+      </View>
 
-      {/* Navigate to About Screen (Nested inside Settings) */}
-      <TouchableOpacity
-        style={styles.optionButton}
-        onPress={() => navigation.navigate("about")}
-      >
-        <Text style={styles.optionText}>About</Text>
-      </TouchableOpacity>
+      {/* Help Centre Section */}
+      <Text style={styles.sectionTitle}>Help Centre</Text>
+      <View style={styles.box}>
+        <TouchableOpacity style={styles.helpItem}>
+          <Ionicons name="headset-outline" size={20} color="black" />
+          <Text style={styles.boxText}>Support</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.helpItem} onPress={() => navigation.navigate("apps")}>
+          <Ionicons name="apps-outline" size={20} color="black" />
+          <Text style={styles.boxText}>Apps</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.helpItem} onPress={() => navigation.navigate("instruction")}>
+          <Ionicons name="document-text-outline" size={20} color="black" />
+          <Text style={styles.boxText}>Instructions</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.helpItem} onPress={() => navigation.navigate("about")}>
+          <Ionicons name="location-outline" size={20} color="black" />
+          <Text style={styles.boxText}>About Us</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -46,52 +70,77 @@ const SettingsScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "flex-start",
-    alignItems: "center",
-    padding: 20,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#F8F8F8",
+    paddingHorizontal: 20,
   },
-  title: {
-    fontSize: 30,
-    fontWeight: "bold",
-    marginVertical: 30,
-    color: "#4CAF50",
-  },
-  settingCard: {
-    width: "100%",
-    padding: 20,
-    marginVertical: 15,
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  settingTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#333",
-  },
-  optionButton: {
-    backgroundColor: "#4CAF50",
+  headerContainer: {
+    width: screenWidth, // Full width header
+    backgroundColor: "white",
     paddingVertical: 15,
-    paddingHorizontal: 40,
-    borderRadius: 8,
-    marginVertical: 10,
-    width: "80%",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 5,
+    alignSelf: "center",
+    paddingHorizontal: 15,
+    marginBottom: 42, // Slight shadow for depth
   },
-  optionText: {
-    color: "#fff",
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
+  },
+  headerText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    flex: 1,
+  },
+  backButton: {
+    position: "absolute",
+    left: 0,
+    zIndex: 10, // Ensures it is above other elements
+    padding: 10, // Adds a better touch area
+  },
+  section: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "white",
+    padding: 15,
+    borderRadius: 10,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 2 },
+    marginVertical: 10,
+  },
+  sectionText: {
+    fontSize: 16,
+  },
+  sectionTitle: {
     fontSize: 18,
     fontWeight: "bold",
+    marginTop: 15,
+    marginBottom: 5,
+  },
+  box: {
+    backgroundColor: "white",
+    padding: 15,
+    borderRadius: 10,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 2 },
+  },
+  boxText: {
+    fontSize: 16,
+    marginVertical: 5,
+  },
+  helpItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 5,
+    gap: 12,
   },
 });
 

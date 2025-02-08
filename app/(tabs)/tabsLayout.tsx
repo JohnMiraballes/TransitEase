@@ -3,12 +3,11 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons"; // Importing the icon library
 
 // Import Screens
-import HomeScreen from "./home";
+import HomeScreen from "./HomeScreen";
 import NavigationScreen from "./navigation";
 import AboutScreen from "./about";
 import InstructionScreen from "./InstructionScreen";
 import SettingsScreen from "./settings";
-import MapScreen from "./MapScreen";
 import AppsScreen from "./AppScreen";
 import TeamScreen from "./TeamScreen";
 
@@ -71,14 +70,13 @@ export default function TabsLayout() {
         },
       })}
     >
-      <Tab.Screen name="home" component={HomeScreen} />
-      <Tab.Screen name="navigation" component={NavigationScreen} />
-      <Tab.Screen name="about" component={AboutScreen} />
+      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Navigation" component={NavigationScreen} />
+      <Tab.Screen name="About" component={AboutScreen} />
       <Tab.Screen name="Instruction" component={InstructionScreen} />
-      <Tab.Screen name="map" component={MapScreen} />
-      <Tab.Screen name="settings" component={SettingsScreen} />
+      <Tab.Screen name="Settings" component={SettingsScreen} />
       <Tab.Screen name="Apps" component={AppsScreen} />
-      <Tab.Screen name="team" component={TeamScreen} />
+      <Tab.Screen name="Team" component={TeamScreen} />
     </Tab.Navigator>
   );
 }
