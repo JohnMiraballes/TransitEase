@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Switch, Button, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, Switch, TouchableOpacity } from "react-native";
 
 const SettingsScreen = ({ navigation }: any) => {
   const [isStepFree, setIsStepFree] = useState(false);
@@ -11,8 +11,8 @@ const SettingsScreen = ({ navigation }: any) => {
       <Text style={styles.title}>Settings</Text>
 
       {/* Step-Free Routes Toggle */}
-      <View style={styles.settingItem}>
-        <Text>Enable Step-Free Routes</Text>
+      <View style={styles.settingCard}>
+        <Text style={styles.settingTitle}>Enable Step-Free Routes</Text>
         <Switch value={isStepFree} onValueChange={toggleStepFree} />
       </View>
 
@@ -39,7 +39,6 @@ const SettingsScreen = ({ navigation }: any) => {
       >
         <Text style={styles.optionText}>About</Text>
       </TouchableOpacity>
-
     </View>
   );
 };
@@ -47,31 +46,51 @@ const SettingsScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "flex-start",
     alignItems: "center",
     padding: 20,
     backgroundColor: "#f9f9f9",
   },
   title: {
-    fontSize: 24,
+    fontSize: 30,
     fontWeight: "bold",
-    marginBottom: 20,
+    marginVertical: 30,
+    color: "#4CAF50",
   },
-  settingItem: {
-    marginVertical: 10,
-    flexDirection: "row",
-    alignItems: "center",
+  settingCard: {
+    width: "100%",
+    padding: 20,
+    marginVertical: 15,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  settingTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#333",
   },
   optionButton: {
     backgroundColor: "#4CAF50",
-    paddingVertical: 12,
+    paddingVertical: 15,
     paddingHorizontal: 40,
-    borderRadius: 5,
+    borderRadius: 8,
     marginVertical: 10,
+    width: "80%",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 5,
   },
   optionText: {
     color: "#fff",
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "bold",
   },
 });

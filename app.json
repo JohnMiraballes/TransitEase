@@ -14,8 +14,10 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+        "backgroundColor": "#ffffff",
+        "package": "com.transitnav.app"
+      },
+      "package": "com.anonymous.TransitNav"
     },
     "web": {
       "bundler": "metro",

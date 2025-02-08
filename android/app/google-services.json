@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "425288456045",
+    "project_id": "transitnav-f2c84",
+    "storage_bucket": "transitnav-f2c84.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:425288456045:android:5f408fdf89bb24eedc2c64",
+        "android_client_info": {
+          "package_name": "com.transitnav.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBfHy_FeaAfDzw9dUJFw7WRCZxX9ZnIAfg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

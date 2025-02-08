@@ -13,6 +13,7 @@ import SettingsScreen from "./settings";
 import MapScreen from "./MapScreen";
 import AppsScreen from "./AppScreen";
 import TeamScreen from "./TeamScreen";
+import SavedPlacesScreen from "./saved";
 
 // Create the stack navigator
 const Stack = createNativeStackNavigator();
@@ -20,12 +21,13 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   return (
     
-      <Stack.Navigator initialRouteName="home" screenOptions={{ headerStyle: styles.header, headerTitleStyle: styles.headerTitle }}>
+      <Stack.Navigator initialRouteName="Home" screenOptions={{ headerStyle: styles.header, headerTitleStyle: styles.headerTitle }}>
         {/* Home Screen */}
         <Stack.Screen
-          name="home"
+          name="Home"
           component={HomeScreen}
           options={({ navigation }) => ({
+            title: "Home", // Manually capitalize first letter
             headerLeft: () => (
               <Ionicons
                 name="home-outline" // Home icon
@@ -47,19 +49,21 @@ export default function App() {
           })}
         />
         {/* Navigation Screen */}
-        <Stack.Screen name="navigation" component={NavigationScreen} />
+        <Stack.Screen name="navigation" component={NavigationScreen} options={{ title: "Navigation" }} />
         {/* About Screen */}
-        <Stack.Screen name="about" component={AboutScreen} />
+        <Stack.Screen name="about" component={AboutScreen} options={{ title: "About" }} />
         {/* Instruction Screen */}
-        <Stack.Screen name="instruction" component={InstructionScreen} />
+        <Stack.Screen name="instruction" component={InstructionScreen} options={{ title: "Instruction" }} />
         {/* Map Screen */}
-        <Stack.Screen name="map" component={MapScreen} />
+        <Stack.Screen name="map" component={MapScreen} options={{ title: "Map" }} />
         {/* Settings Screen */}
-        <Stack.Screen name="settings" component={SettingsScreen} />
+        <Stack.Screen name="settings" component={SettingsScreen} options={{ title: "Settings" }} />
         {/* Apps Screen */}
-        <Stack.Screen name="apps" component={AppsScreen} />
+        <Stack.Screen name="apps" component={AppsScreen} options={{ title: "Apps" }} />
         {/* Team Screen */}
-        <Stack.Screen name="team" component={TeamScreen} />
+        <Stack.Screen name="team" component={TeamScreen} options={{ title: "Team" }} />
+        {/* Saved Places Screen */}
+        <Stack.Screen name="savedPlaces" component={SavedPlacesScreen} options={{ title: "Saved Places" }} />
       </Stack.Navigator>
     
   );
