@@ -1,6 +1,7 @@
 apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
+apply plugin: 'com.google.gms.google-services' 
 
 def projectRoot = rootDir.getAbsoluteFile().getParentFile().getAbsolutePath()
 
@@ -173,4 +174,10 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+
+    dependencies {
+    classpath("com.google.gms:google-services:4.3.10")  // Make sure it's the latest version
+}
+
+
 }

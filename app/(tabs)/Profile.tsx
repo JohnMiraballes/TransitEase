@@ -20,10 +20,10 @@ const ProfileScreen = ({ navigation }: any) => {
 
       {/* Profile Section */}
       <View style={styles.profileSection}>
-        <Image
-          source={{ uri: "https://via.placeholder.com/100" }} // Replace with actual profile image
+      <Image
+          source={require("../../assets/images/download.jpg")} // Replace with your actual profile image path
           style={styles.profileImage}
-        />
+/>
         <Text style={styles.profileName}>John Doe</Text>
       </View>
 

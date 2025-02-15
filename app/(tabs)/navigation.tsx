@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator } from "react-native";
+import { 
+  View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, Alert 
+} from "react-native";
 import * as Location from "expo-location";
 import MapView, { Polyline, Marker } from "react-native-maps";
+import { Ionicons } from "@expo/vector-icons"; // Import Icons
 
-const NavigationScreen = () => {
+const NavigationScreen = ({ navigation }: any) => {
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [loading, setLoading] = useState(true);
-  const [routes, setRoutes] = useState([
+  const [selectedRoute, setSelectedRoute] = useState<string | null>(null);
+
+  const stepFreeRoutes = [
     {
       id: "1",
       duration: "12 min",
@@ -18,19 +23,8 @@ const NavigationScreen = () => {
       ],
       isPWDRoute: true, // Step-Free Route
     },
-    {
-      id: "2",
-      duration: "10 min",
-      traffic: "Faster but may have stairs",
-      coordinates: [
-        { latitude: 14.55, longitude: 120.99 },
-        { latitude: 14.58, longitude: 121.0 },
-      ],
-      isPWDRoute: false, // Not PWD-Friendly
-    },
-  ]);
+  ];
 
-  // Default location (Manila, Philippines) if GPS is unavailable
   const defaultLocation = { latitude: 14.5995, longitude: 120.9842 };
 
   useEffect(() => {
@@ -48,8 +42,28 @@ const NavigationScreen = () => {
     })();
   }, []);
 
+  const handleSelectRoute = (id: string) => {
+    setSelectedRoute(id);
+  };
+
+  const handleStartNavigation = () => {
+    if (!selectedRoute) {
+      Alert.alert("Select a Route", "Please choose a step-free route before starting.");
+      return;
+    }
+    Alert.alert("Navigation Started", "Follow the selected step-free route.");
+  };
+
   return (
     <View style={styles.container}>
+      {/* Header with Back Button */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={28} color="white" />
+        </TouchableOpacity>
+        <Text style={styles.title}>Navigation</Text>
+      </View>
+
       {loading ? (
         <ActivityIndicator size="large" color="#4CAF50" style={{ marginTop: 20 }} />
       ) : (
@@ -62,35 +76,34 @@ const NavigationScreen = () => {
             longitudeDelta: 0.05,
           }}
         >
-          {/* Show Routes */}
-          {routes.map((route, index) => (
+          {stepFreeRoutes.map((route) => (
             <Polyline
-              key={index}
+              key={route.id}
               coordinates={route.coordinates}
-              strokeWidth={4}
-              strokeColor={route.isPWDRoute ? "green" : "blue"}
+              strokeWidth={6}
+              strokeColor={selectedRoute === route.id ? "darkgreen" : "green"}
             />
           ))}
-
-          {/* Start and End Markers */}
           {location && <Marker coordinate={location} title="Your Location" />}
           <Marker coordinate={{ latitude: 14.58, longitude: 121.0 }} title="Destination" />
         </MapView>
       )}
 
-      {/* Route Options */}
       <FlatList
-        data={routes}
+        data={stepFreeRoutes}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={[styles.routeContainer, item.isPWDRoute && styles.pwdRoute]}>
+          <TouchableOpacity
+            style={[styles.routeContainer, item.isPWDRoute && styles.pwdRoute, selectedRoute === item.id && styles.selectedRoute]}
+            onPress={() => handleSelectRoute(item.id)}
+          >
             <Text style={styles.routeText}>{item.duration}</Text>
             <Text style={styles.trafficText}>{item.traffic}</Text>
-          </View>
+          </TouchableOpacity>
         )}
       />
 
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button} onPress={handleStartNavigation}>
         <Text style={styles.buttonText}>Go Now</Text>
       </TouchableOpacity>
     </View>
@@ -99,13 +112,50 @@ const NavigationScreen = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: "#fff" },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#4CAF50", // Green header for easy visibility
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 15,
+    borderBottomRightRadius: 15,
+  },
+  backButton: {
+    padding: 10,
+    position: "absolute",
+    left: 0,
+    zIndex: 1,
+  },
+  title: {
+    flex: 1,
+    fontSize: 26,
+    fontWeight: "bold",
+    color: "white",
+    textAlign: "center",
+  },
   map: { width: "100%", height: 300 },
-  routeContainer: { padding: 10, borderBottomWidth: 1, borderBottomColor: "#ddd" },
-  pwdRoute: { backgroundColor: "#E6F9E6" }, // Highlight PWD-friendly route
-  routeText: { fontSize: 16, fontWeight: "bold" },
-  trafficText: { fontSize: 14, color: "#777" },
-  button: { backgroundColor: "#4CAF50", padding: 12, borderRadius: 5, marginTop: 10, alignItems: "center" },
-  buttonText: { color: "#fff", fontWeight: "bold" },
+  routeContainer: {
+    padding: 15,
+    marginVertical: 8,
+    borderRadius: 12,
+    backgroundColor: "#e8f5e9", // Light green background for routes
+    borderWidth: 1,
+    borderColor: "#d0f1d7",
+  },
+  pwdRoute: { backgroundColor: "#e0f7fa" }, // Highlight PWD-friendly routes
+  selectedRoute: { backgroundColor: "#A5D6A7" }, // Highlight selected route
+  routeText: { fontSize: 18, fontWeight: "bold", color: "#388E3C" }, // Larger text size
+  trafficText: { fontSize: 16, color: "#777" },
+  button: {
+    backgroundColor: "#4CAF50", 
+    padding: 14, 
+    borderRadius: 10, 
+    marginTop: 15, 
+    alignItems: "center", 
+    elevation: 5, // Shadow for Android
+  },
+  buttonText: { color: "#fff", fontSize: 20, fontWeight: "bold" },
 });
 
 export default NavigationScreen;

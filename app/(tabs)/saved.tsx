@@ -5,12 +5,12 @@ import { Ionicons } from "@expo/vector-icons";
 const SavedScreen = ({ navigation }: any) => {
   return (
     <View style={styles.container}>
-      {/* Header Section inside a White Background Container */}
+      {/* Header Section with Green Background */}
       <View style={styles.headerContainer}>
         <View style={styles.header}>
           {/* Back Button */}
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Ionicons name="arrow-back" size={24} color="black" />
+            <Ionicons name="arrow-back" size={24} color="white" />
           </TouchableOpacity>
 
           {/* Title */}
@@ -53,7 +53,7 @@ const SavedScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F8F9FA" },
   headerContainer: {
-    backgroundColor: "white",
+    backgroundColor: "#4CAF50", // Green background for better visibility
   },
   header: {
     flexDirection: "row",
@@ -62,8 +62,9 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   headerText: {
-    fontSize: 18,
+    fontSize: 22, // Increased font size for readability
     fontWeight: "bold",
+    color: "white", // White text for contrast
     textAlign: "center",
     flex: 1,
   },
@@ -80,7 +81,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
   },
-  menuText: { fontSize: 16, marginLeft: 10 },
+  menuText: { fontSize: 18, marginLeft: 10 }, // Increased font size for menu items
   addPlaceContainer: {
     backgroundColor: "white",
     borderRadius: 10,
@@ -92,7 +93,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 15,
   },
-  emptyMessage: { textAlign: "center", marginTop: 20, color: "#999" },
+  emptyMessage: { textAlign: "center", marginTop: 20, color: "#999", fontSize: 16 }, // Larger empty state text
 });
 
 export default SavedScreen;

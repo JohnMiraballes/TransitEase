@@ -17,7 +17,7 @@ const MenuScreen = ({ navigation }: any) => {
         <View style={styles.menu}>
           {/* Close Button */}
           <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()}>
-            <Ionicons name="close" size={24} color="black" />
+            <Ionicons name="close" size={28} color="black" />
           </TouchableOpacity>
 
           {/* App Title */}
@@ -26,8 +26,8 @@ const MenuScreen = ({ navigation }: any) => {
           {/* Profile Section */}
           <View style={styles.profileSection}>
             <Image
-              source={{ uri: "https://via.placeholder.com/50" }} // Replace with actual profile image URL
-              style={styles.profileImage}
+                      source={require("../../assets/images/download.jpg")} // Replace with your actual profile image path
+                      style={styles.profileImage}
             />
             <View>
               <Text style={styles.greeting}>Hey John!</Text>
@@ -41,23 +41,23 @@ const MenuScreen = ({ navigation }: any) => {
 
           {/* Menu Items */}
           <TouchableOpacity style={styles.menuItem}>
-            <FontAwesome5 name="calendar-alt" size={20} color="black" />
+            <FontAwesome5 name="calendar-alt" size={22} color="black" />
             <Text style={styles.menuText}>Schedule your plan</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.menuItem}>
-            <Feather name="clock" size={20} color="black" />
+            <Feather name="clock" size={22} color="black" />
             <Text style={styles.menuText}>Recent Location</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("savedPlaces")}>
-            <FontAwesome5 name="bookmark" size={20} color="black" />
+            <FontAwesome5 name="bookmark" size={22} color="black" />
             <Text style={styles.menuText}>Saved Places</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("settings")}>
-            <Ionicons name="settings-sharp" size={20} color="black" />
+            <Ionicons name="settings-sharp" size={22} color="black" />
             <Text style={styles.menuText}>Settings</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.menuItem}>
-            <MaterialIcons name="help-outline" size={22} color="black" />
+            <MaterialIcons name="help-outline" size={24} color="black" />
             <Text style={styles.menuText}>Help and feedback</Text>
           </TouchableOpacity>
         </View>
@@ -74,11 +74,13 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   menu: {
-    width: "100%", // 80% of screen width
+    width: "75%", // 80% of screen width
     height: "100%",
-    backgroundColor: "#fff",
-    padding: 20,
+    backgroundColor: "#4CAF50", // Menu background color
+    padding: 25,
     elevation: 5, // Shadow effect for Android
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
   },
   closeButton: {
     position: "absolute",
@@ -86,55 +88,68 @@ const styles = StyleSheet.create({
     right: 20,
   },
   title: {
-    fontSize: 22,
+    fontSize: 30, // Larger font size for better readability
     fontWeight: "bold",
-    marginBottom: 70,
+    marginBottom: 40,
+    textAlign: "center",
+    color: "black", // Highlight color for the title
   },
   profileSection: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 15,
+    marginBottom: 25,
   },
   profileImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 32,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginRight: 25,
   },
   greeting: {
-    fontSize: 24,
+    fontSize: 26, // Larger font for greeting
     fontWeight: "bold",
-    marginBottom: 16,
+    marginBottom: 10,
+    backgroundColor: "#fff", // Highlight color for the greeting
+    padding: 5,
+    borderRadius: 10,
   },
   profileButton: {
-    backgroundColor: 'rgba(108, 108, 108, 0.1)',
-    paddingHorizontal: 10,
-    paddingVertical: 7,
+    backgroundColor: '#e0f7fa',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     borderRadius: 10,
     marginTop: 5,
-    width: 104,
-    height: 32,
+    width: 120,
+    height: 40,
   },
   profileText: {
-    fontSize: 12,
+    fontSize: 14, // Slightly larger text
     fontWeight: "bold",
-    color: "#4A90E2",
+    color: "#00796B", // Subtle green for text
     textAlign: "center",
   },
   divider: {
     height: 1,
-    backgroundColor: "#ddd",
-    marginVertical: 10,
+    backgroundColor: "black",
+    marginVertical: 15,
   },
   menuItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 12,
+    paddingVertical: 15,
+    borderRadius: 10,
+    marginBottom: 5,
+    backgroundColor: "#fff", // White background for menu items
+    paddingHorizontal: 15, // Adds padding on the left and right for spacing
   },
   menuText: {
-    fontSize: 16,
-    marginLeft: 10,
+    fontSize: 18, // Larger font size for menu text
+    marginLeft: 15, // Adds space between the icon and the text
+    fontWeight: "bold",
+    color: "#333",
   },
 });
+
+
 
 export default MenuScreen;

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, Switch, StyleSheet, Dimensions } from "react-native";
+import { View, Text, TouchableOpacity, Switch, StyleSheet, Dimensions, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 // Get screen width for full-width header
@@ -9,14 +9,14 @@ const SettingsScreen = ({ navigation }: any) => {
   const [isStepFree, setIsStepFree] = useState(false);
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       {/* Header Section with Full Width */}
       <View style={styles.headerContainer}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={24} color="black" />
+            <Ionicons name="arrow-back" size={30} color="white" />
           </TouchableOpacity>
-          <Text style={styles.headerText}>Setting</Text>
+          <Text style={styles.headerText}>Settings</Text>
         </View>
       </View>
 
@@ -26,6 +26,8 @@ const SettingsScreen = ({ navigation }: any) => {
         <Switch
           value={isStepFree}
           onValueChange={(value) => setIsStepFree(value)}
+          trackColor={{ false: "#767577", true: "#81b0ff" }}
+          thumbColor={isStepFree ? "#4CAF50" : "#f4f3f4"}
         />
       </View>
 
@@ -36,7 +38,7 @@ const SettingsScreen = ({ navigation }: any) => {
           <Text style={styles.boxText}>Login</Text>
         </TouchableOpacity>
         <TouchableOpacity>
-          <Text style={styles.boxText}>Sign up</Text>
+          <Text style={styles.boxText}>Sign Up</Text>
         </TouchableOpacity>
       </View>
 
@@ -44,26 +46,26 @@ const SettingsScreen = ({ navigation }: any) => {
       <Text style={styles.sectionTitle}>Help Centre</Text>
       <View style={styles.box}>
         <TouchableOpacity style={styles.helpItem}>
-          <Ionicons name="headset-outline" size={20} color="black" />
+          <Ionicons name="headset-outline" size={25} color="black" />
           <Text style={styles.boxText}>Support</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.helpItem} onPress={() => navigation.navigate("apps")}>
-          <Ionicons name="apps-outline" size={20} color="black" />
+          <Ionicons name="apps-outline" size={25} color="black" />
           <Text style={styles.boxText}>Apps</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.helpItem} onPress={() => navigation.navigate("instruction")}>
-          <Ionicons name="document-text-outline" size={20} color="black" />
+          <Ionicons name="document-text-outline" size={25} color="black" />
           <Text style={styles.boxText}>Instructions</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.helpItem} onPress={() => navigation.navigate("about")}>
-          <Ionicons name="location-outline" size={20} color="black" />
+          <Ionicons name="location-outline" size={25} color="black" />
           <Text style={styles.boxText}>About Us</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -75,11 +77,12 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     width: screenWidth, // Full width header
-    backgroundColor: "white",
-    paddingVertical: 15,
+    backgroundColor: "#4CAF50", // Green header color
+    paddingVertical: 20,
     alignSelf: "center",
     paddingHorizontal: 15,
     marginBottom: 42, // Slight shadow for depth
+    borderRadius: 12, // Rounded corners for header
   },
   header: {
     flexDirection: "row",
@@ -88,44 +91,45 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   headerText: {
-    fontSize: 24,
+    fontSize: 30, // Larger font for readability
     fontWeight: "bold",
     textAlign: "center",
     flex: 1,
+    color: "white", // White color for better contrast
   },
   backButton: {
     position: "absolute",
     left: 0,
     zIndex: 10, // Ensures it is above other elements
-    padding: 10, // Adds a better touch area
+    padding: 12, // Larger tap area for back button
   },
   section: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: "white",
-    padding: 15,
-    borderRadius: 10,
+    padding: 20, // Increased padding for better spacing
+    borderRadius: 12,
     elevation: 2,
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 5,
     shadowOffset: { width: 0, height: 2 },
-    marginVertical: 10,
+    marginVertical: 12, // More spacing between sections
   },
   sectionText: {
-    fontSize: 16,
+    fontSize: 18, // Larger text for readability
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20, // Larger title for clarity
     fontWeight: "bold",
-    marginTop: 15,
-    marginBottom: 5,
+    marginTop: 20,
+    marginBottom: 10,
   },
   box: {
     backgroundColor: "white",
-    padding: 15,
-    borderRadius: 10,
+    padding: 20, // Increased padding for larger tap area
+    borderRadius: 12,
     elevation: 2,
     shadowColor: "#000",
     shadowOpacity: 0.1,
@@ -133,13 +137,13 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
   },
   boxText: {
-    fontSize: 16,
-    marginVertical: 5,
+    fontSize: 18, // Larger font for better readability
+    marginVertical: 10, // Increased space between items
   },
   helpItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 5,
+    paddingVertical: 10, // More padding for easier tapping
     gap: 12,
   },
 });
