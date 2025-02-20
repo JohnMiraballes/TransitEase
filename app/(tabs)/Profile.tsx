@@ -29,12 +29,12 @@ const ProfileScreen = ({ navigation }: any) => {
 
       {/* Profile Options (Account & Home/Work) */}
       <View style={styles.optionsContainer}>
-        <TouchableOpacity style={styles.option}>
+        <TouchableOpacity style={styles.option} onPress={() => navigation.navigate("Login")}>
           <Ionicons name="person-outline" size={20} color="black" />
           <Text style={styles.optionText}>Account and login</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.option} onPress={() => navigation.navigate("savedPlaces")}>
+        <TouchableOpacity style={styles.option} onPress={() => navigation.navigate("SavedPlaces")}>
           <Ionicons name="briefcase-outline" size={20} color="black" />
           <Text style={styles.optionText}>Home and work</Text>
         </TouchableOpacity>

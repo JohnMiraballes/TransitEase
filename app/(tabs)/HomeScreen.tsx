@@ -1,17 +1,31 @@
-import React, { useState, useEffect } from "react";
-import { 
-  View, Text, TextInput, StyleSheet, TouchableOpacity, FlatList, 
-  ActivityIndicator, Alert, Animated 
+import React, { useState, useEffect, useRef } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  Alert,
+  Animated,
+  PanResponder,
+  ActivityIndicator,
+  BackHandler,
 } from "react-native";
 import * as Location from "expo-location";
 import MapView, { Marker } from "react-native-maps";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { Dispatch, SetStateAction } from "react";
 
-type RootStackParamList = { Home: undefined; Menu: undefined; navigation: undefined};
+
+type RootStackParamList = { Home: undefined; Menu: undefined; Navigation: undefined };
 type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, "Home">;
-type HomeScreenProps = { navigation: HomeScreenNavigationProp; };
+type HomeScreenProps = { 
+  navigation: HomeScreenNavigationProp;
+  setIsLoggedIn: Dispatch<SetStateAction<boolean | null>>;
+ };
 
 const HomeScreen = ({ navigation }: HomeScreenProps) => {
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
@@ -20,8 +34,7 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
   const [workLocation, setWorkLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false);
-
-  const [bottomSheetAnim] = useState(new Animated.Value(0));
+  const bottomSheetAnim = useRef(new Animated.Value(500)).current;
 
   useEffect(() => {
     const loadSavedLocations = async () => {
@@ -55,37 +68,62 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
     })();
   }, []);
 
-  // Animation Logic
-  const toggleBottomSheet = () => {
+  useEffect(() => {
+    const backAction = () => {
+      if (navigation.isFocused()) {
+        // Only exit if the user is on the Home Screen
+        Alert.alert("Exit App", "Do you want to exit?", [
+          { text: "Cancel", style: "cancel" },
+          { text: "Exit", onPress: () => BackHandler.exitApp() },
+        ]);
+        return true;
+      }
+      return false; // Allow default back navigation
+    };
+  
+    const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
+    return () => backHandler.remove();
+  }, [navigation]);
+  const toggleBottomSheet = (forceClose = false) => {
     Animated.timing(bottomSheetAnim, {
-      toValue: bottomSheetOpen ? 0 : 1,
+      toValue: forceClose ? 500 : 0,
       duration: 300,
       useNativeDriver: true,
     }).start();
-    setBottomSheetOpen(!bottomSheetOpen);
+    setBottomSheetOpen(!forceClose);
   };
 
-  const bottomSheetTranslateY = bottomSheetAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [500, 0], // Moves from off-screen (500px down) to fully visible
-  });
-
-  const overlayOpacity = bottomSheetAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 0.5], // Creates a dimmed background effect when open
-  });
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderMove: (_, gesture) => {
+        if (gesture.dy > 0) {
+          bottomSheetAnim.setValue(gesture.dy);
+        }
+      },
+      onPanResponderRelease: (_, gesture) => {
+        if (gesture.dy > 100) {
+          toggleBottomSheet(true);
+        } else {
+          Animated.timing(bottomSheetAnim, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+          }).start();
+        }
+      },
+    })
+  ).current;
 
   return (
     <View style={styles.container}>
-      {/* Hamburger Menu */}
       {!bottomSheetOpen && (
         <TouchableOpacity style={styles.hamburger} onPress={() => navigation.navigate("Menu")}>
           <Ionicons name="menu" size={28} color="black" />
         </TouchableOpacity>
       )}
 
-      {/* Map Section */}
-      <View style={styles.mapContainer}>
+<View style={styles.mapContainer}>
         {loading ? (
           <ActivityIndicator size="large" color="#4CAF50" />
         ) : (
@@ -105,57 +143,74 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
         )}
       </View>
 
-      {/* Overlay (Appears when Bottom Sheet is open) */}
-      {bottomSheetOpen && <Animated.View style={[styles.overlay, { opacity: overlayOpacity }]} />}
+      <Animated.View
+        {...panResponder.panHandlers}
+        style={[styles.bottomSheet, { transform: [{ translateY: bottomSheetAnim }] }]}
+      >
+        <View style={styles.dragHandle} />
 
-      {/* Bottom Sheet */}
-      <Animated.View style={[styles.bottomSheet, { transform: [{ translateY: bottomSheetTranslateY }] }]}>
-        {/* Toggle Arrow */}
-        <TouchableOpacity style={styles.arrowContainer} onPress={toggleBottomSheet}>
-          <Ionicons name={bottomSheetOpen ? "chevron-down" : "chevron-up"} size={24} color="black" />
-        </TouchableOpacity>
-
-        {/* Search Bar */}
         <View style={styles.searchBarContainer}>
+          <Ionicons name="search" size={20} color="gray" style={styles.searchIcon} />
           <TextInput
             style={styles.searchBar}
             placeholder="Where to?"
             value={searchQuery}
             onChangeText={setSearchQuery}
-            onFocus={() => !bottomSheetOpen && toggleBottomSheet()} // Expands when tapped
+            onFocus={() => toggleBottomSheet(false)}
           />
+          <TouchableOpacity onPress={() => Alert.alert("Voice Search Coming Soon!")}>
+            <Ionicons name="mic" size={20} color="gray" style={styles.micIcon} />
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity 
-          style={styles.stepFreeButton} 
-          onPress={() => navigation.navigate("navigation")} // Navigate to Navigation Screen
-        >
+
+        <TouchableOpacity style={styles.stepFreeButton} onPress={() => navigation.navigate("Navigation")}>
           <Text style={styles.stepFreeText}>🚶‍♂️ Step-Free Route</Text>
         </TouchableOpacity>
 
-        {/* Quick Access Buttons */}
         <View style={styles.quickAccess}>
-          <TouchableOpacity style={styles.quickButton} onPress={() => Alert.alert("Set Home Location")}>
-            <Text style={styles.buttonText}>🏠 Home</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.quickButton} onPress={() => Alert.alert("Set Work Location")}>
-            <Text style={styles.buttonText}>🏢 Work</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.quickButton} onPress={() => Alert.alert("Feature Coming Soon!")}>
-            <Text style={styles.buttonText}>➕ Add</Text>
-          </TouchableOpacity>
-        </View>
+  <TouchableOpacity style={styles.quickButton} onPress={() => Alert.alert("Set Home Location")}>
+    <View style={styles.quickIconWrapper}>
+      <Ionicons name="home" size={28} color="#007AFF" />
+    </View>
+    <Text style={styles.quickText}>Home</Text>
+    <Text style={styles.quickSubText}>Add</Text>
+  </TouchableOpacity>
 
-        {/* Recent Locations */}
+  <TouchableOpacity style={styles.quickButton} onPress={() => Alert.alert("Set Work Location")}>
+    <View style={styles.quickIconWrapper}>
+      <Ionicons name="briefcase" size={28} color="#007AFF" />
+    </View>
+    <Text style={styles.quickText}>Work</Text>
+    <Text style={styles.quickSubText}>Add</Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity style={styles.quickButton} onPress={() => Alert.alert("Feature Coming Soon!")}>
+    <View style={styles.quickIconWrapper}>
+      <Ionicons name="add" size={28} color="#007AFF" />
+    </View>
+    <Text style={styles.quickText}>Add</Text>
+    <Text style={styles.quickSubText}> </Text> {/* Keeps alignment consistent */}
+  </TouchableOpacity>
+</View>
+
+
+
+       
+          <Text style={styles.recentHeader}>Recent</Text>
+
         <FlatList
           data={[
-            { name: "Pamantasan ng Cabuyao", address: "Cabuyao, Laguna" },
-            { name: "SM City Santa Rosa", address: "Santa Rosa, Laguna" },
+            { name: "Pamantasan ng Cabuyao", address: "Cabuyao, Laguna", icon: "time-outline" },
+            { name: "SM City Santa Rosa", address: "Santa Rosa, Laguna", icon: "time-outline" },
           ]}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item }) => (
             <View style={styles.recentItem}>
-              <Text style={styles.recentText}>{item.name}</Text>
-              <Text style={styles.recentSubText}>{item.address}</Text>
+              <Ionicons name={item.icon as keyof typeof Ionicons.glyphMap} size={20} color="#333" style={styles.recentItemIcon} />
+              <View>
+                <Text style={styles.recentText}>{item.name}</Text>
+                <Text style={styles.recentSubText}>{item.address}</Text>
+              </View>
             </View>
           )}
         />
@@ -171,90 +226,98 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 50,
     left: 20,
-    backgroundColor: "#fff",
-    padding: 10,
-    borderRadius: 10,
-    elevation: 5,
     zIndex: 10,
-    borderWidth: 1,
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 50,
   },
   bottomSheet: {
-    backgroundColor: "#4CAF50", // Green color for bottom sheet
+    backgroundColor: "#fff",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
     position: "absolute",
     bottom: 0,
     width: "100%",
-    height: "100%", // Covers the entire screen when expanded
-    borderTopWidth: 2,  // Border for the top of the bottom sheet
-    borderTopColor: "black", // Light gray color for the top border
+    height: "85%",
   },
-  overlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    backgroundColor: "black",
-  },
-  arrowContainer: {
+  dragHandle: {
+    width: 60,
+    height: 3,
+    backgroundColor: "#ccc",
+    borderRadius: 3,
     alignSelf: "center",
-    backgroundColor: "#e0e0e0",
-    borderRadius: 20,
-    padding: 5,
-    marginBottom: 10,
-    borderWidth: 1,  // Border for the arrow container
-    borderColor: "#ddd", // Light gray border color
+    marginBottom: 13,
   },
-  stepFreeButton: {
-    backgroundColor: "#fff", // Green color for visibility
-    padding: 12,
-    borderRadius: 10,
+  searchBarContainer: {
+    flexDirection: "row",
     alignItems: "center",
-    marginHorizontal: 20,
-    marginTop: 10,
-    marginBottom: 10,
-    borderWidth: 1,  // Border for step-free button
-    borderColor: "black", // Green color border
+    backgroundColor: "#f2f2f2",
+    borderRadius: 20,
+    padding: 10,
+    marginBottom: 15,
   },
-  stepFreeText: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "black",
+  quickAccess: {
+    flexDirection: "row",
+    justifyContent: "space-evenly", // ✅ Evenly spaces all buttons
+    alignItems: "center",
+    marginBottom: 15,
   },
-  searchBarContainer: { 
-    backgroundColor: "#f2f2f2", 
-    borderRadius: 10, 
-    padding: 10, 
-    marginBottom: 15, 
-    borderWidth: 1,  // Border for the search bar container
-    borderColor: "black", // Light gray border for separation
-  },
-  searchBar: { fontSize: 16, color: "#333" },
-  quickAccess: { flexDirection: "row", justifyContent: "space-around", marginBottom: 15 },
+  
   quickButton: {
-    backgroundColor: "#f2f2f2", 
-    padding: 10, 
-    borderRadius: 10, 
-    alignItems: "center", 
-    width: "30%", 
-    borderWidth: 1,  // Border for each quick button
-    borderColor: "black", // Light gray border for separation
+    alignItems: "center",
+    justifyContent: "center",
+    width: 80, // ✅ Ensures all buttons have equal width
   },
-  buttonText: { fontSize: 16, fontWeight: "bold" },
+  
+  quickIconWrapper: {
+    width: 60, // ✅ Ensures uniform circle size
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: "#f2f2f2",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  
+  quickText: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#000",
+    textAlign: "center",
+    marginTop: 5, // ✅ Adds space between icon and text
+  },
+  
+  quickSubText: {
+    fontSize: 12,
+    color: "#666",
+    textAlign: "center",
+    marginTop: 2, // ✅ Ensures uniform spacing
+  },
+  
+  
+  searchIcon: { marginRight: 10 },
+  searchBar: { flex: 1, fontSize: 16, color: "#333" },
+  micIcon: { marginLeft: 10 },
+  stepFreeButton: { backgroundColor: "#007AFF", padding: 12, borderRadius: 20, alignItems: "center", marginBottom: 15 },
+  stepFreeText: { color: "#fff", fontWeight: "bold" },
+  buttonText: { fontSize: 14 },
+  
+  // ✅ Added styles for the missing properties
+  recentHeaderContainer: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
+  recentIcon: { marginRight: 5 }, // Fix for missing `recentIcon`
+  recentHeader: { fontSize: 16, fontWeight: "bold", color: "#333" }, // Fix for missing `recentHeader`
+  
   recentItem: { 
-    padding: 10, 
-    backgroundColor: "#fff",  // White background for better contrast
+    flexDirection: "row", 
+    alignItems: "center", 
+    paddingVertical: 10, 
     borderBottomWidth: 1, 
-    borderBottomColor: "#ddd",  // Light gray border for subtle separation
-    borderRadius: 10,  // Rounded corners for a softer look
-    marginBottom: 10, // Space between items
-    borderWidth: 1,  // Border for the entire recent item
-    borderColor: "black",  // Light gray border color for all sides
+    borderBottomColor: "#ddd" 
   },
-  recentText: { fontSize: 16, fontWeight: "bold" },
-  recentSubText: { fontSize: 12, color: "#777" },
+  recentItemIcon: { marginRight: 10 },
+  recentText: { fontWeight: "bold" },
+  recentSubText: { color: "#666" },
 });
+
 
 export default HomeScreen;

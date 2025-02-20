@@ -1,12 +1,23 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, Switch, StyleSheet, Dimensions, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity, Switch, StyleSheet, Dimensions, ScrollView, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Get screen width for full-width header
 const screenWidth = Dimensions.get("window").width;
 
 const SettingsScreen = ({ navigation }: any) => {
   const [isStepFree, setIsStepFree] = useState(false);
+
+  // Function to reset app experience
+  const resetFirstTime = async () => {
+    try {
+      await AsyncStorage.removeItem("isFirstTime");
+      Alert.alert("Reset Successful", "The app will now show the Get Started screen on next launch.");
+    } catch (error) {
+      Alert.alert("Error", "Something went wrong while resetting.");
+    }
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -34,10 +45,10 @@ const SettingsScreen = ({ navigation }: any) => {
       {/* Accounts Section */}
       <Text style={styles.sectionTitle}>Accounts</Text>
       <View style={styles.box}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("Login")}>
           <Text style={styles.boxText}>Login</Text>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
           <Text style={styles.boxText}>Sign Up</Text>
         </TouchableOpacity>
       </View>
@@ -45,26 +56,32 @@ const SettingsScreen = ({ navigation }: any) => {
       {/* Help Centre Section */}
       <Text style={styles.sectionTitle}>Help Centre</Text>
       <View style={styles.box}>
-        <TouchableOpacity style={styles.helpItem}>
+        <TouchableOpacity style={styles.helpItem} onPress={() => Alert.alert("Customer Support Coming Soon!")}>
           <Ionicons name="headset-outline" size={25} color="black" />
           <Text style={styles.boxText}>Support</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.helpItem} onPress={() => navigation.navigate("apps")}>
+        <TouchableOpacity style={styles.helpItem} onPress={() => navigation.navigate("Apps")}>
           <Ionicons name="apps-outline" size={25} color="black" />
           <Text style={styles.boxText}>Apps</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.helpItem} onPress={() => navigation.navigate("instruction")}>
+        <TouchableOpacity style={styles.helpItem} onPress={() => navigation.navigate("Instruction")}>
           <Ionicons name="document-text-outline" size={25} color="black" />
           <Text style={styles.boxText}>Instructions</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.helpItem} onPress={() => navigation.navigate("about")}>
+        <TouchableOpacity style={styles.helpItem} onPress={() => navigation.navigate("About")}>
           <Ionicons name="location-outline" size={25} color="black" />
           <Text style={styles.boxText}>About Us</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Reset App Experience Button */}
+      <TouchableOpacity style={styles.resetButton} onPress={resetFirstTime}>
+        <Text style={styles.resetButtonText}>Reset App Experience</Text>
+      </TouchableOpacity>
+
     </ScrollView>
   );
 };
@@ -82,7 +99,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     paddingHorizontal: 15,
     marginBottom: 42, // Slight shadow for depth
-    borderRadius: 12, // Rounded corners for header
+     // Rounded corners for header
   },
   header: {
     flexDirection: "row",
@@ -145,6 +162,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 10, // More padding for easier tapping
     gap: 12,
+  },
+  resetButton: {
+    backgroundColor: "#FF5252", // Red color for warning
+    padding: 15,
+    borderRadius: 12,
+    alignItems: "center",
+    marginTop: 30,
+  },
+  resetButtonText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "bold",
   },
 });
 
