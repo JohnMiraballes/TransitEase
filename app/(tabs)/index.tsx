@@ -67,9 +67,16 @@ export default function AppNavigator() {
   const checkLoginStatus = useCallback(async () => {
     try {
       const userToken = await AsyncStorage.getItem("userToken");
-      setIsLoggedIn(userToken ? true : false);
+      console.log("Retrieved userToken:", userToken); // Debugging
+
+      if (userToken !== null) {
+        setIsLoggedIn(true);
+      } else {
+        setIsLoggedIn(false);
+      }
     } catch (error) {
       console.error("Error checking login status:", error);
+      setIsLoggedIn(false);
     }
   }, []);
 
