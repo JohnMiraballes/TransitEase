@@ -1,41 +1,44 @@
-import React, { useState, useEffect } from "react";
-import { 
-  View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, ScrollView 
+import React, { useState, useEffect, useRef } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  ActivityIndicator,
 } from "react-native";
 import * as Location from "expo-location";
 import MapView, { Marker, Callout } from "react-native-maps";
 import { Ionicons } from "@expo/vector-icons";
+import { StackNavigationProp } from "@react-navigation/stack";
 
-const AccessibilityScreen = ({ navigation }: any) => {
+type Props = {
+  navigation: StackNavigationProp<any>;
+};
+
+type RouteType = {
+  id: string;
+  name: string;
+  description: string;
+  coordinates: { latitude: number; longitude: number };
+  type: "step-free" | "regular"; // Distinguishing routes
+};
+
+const AccessibilityScreen: React.FC<Props> = ({ navigation }) => {
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [loading, setLoading] = useState(true);
-  
-  type IoniconName = "walk" | "trail-sign";
+  const mapRef = useRef<MapView>(null);
 
-  const stepFreeRoutes: { 
-    id: string; 
-    name: string; 
-    description: string; 
-    coordinates: { latitude: number; longitude: number }; 
-    icon: IoniconName;
-  }[] = [
-    {
-      id: "1",
-      name: "Main Street Pathway",
-      description: "Ramps, elevators, and resting spots available.",
-      coordinates: { latitude: 14.55, longitude: 120.99 },
-      icon: "walk",
-    },
-    {
-      id: "2",
-      name: "City Plaza Walkway",
-      description: "Step-free access with tactile paving for visually impaired users.",
-      coordinates: { latitude: 14.56, longitude: 121.0 },
-      icon: "trail-sign",
-    }
+  const routes: RouteType[] = [
+    { id: "1", name: "Cabuyao Central Park", description: "Fully wheelchair-accessible with ramps.", coordinates: { latitude: 14.2786, longitude: 121.1251 }, type: "step-free" },
+    { id: "2", name: "Cabuyao Public Market", description: "Ramps and smooth walkways for easy mobility.", coordinates: { latitude: 14.2776, longitude: 121.1239 }, type: "step-free" },
+    { id: "3", name: "Sala Barangay Hall", description: "Smooth pathways and ramps for easy wheelchair access.", coordinates: { latitude: 14.2712, longitude: 121.1241 }, type: "step-free" },
+    { id: "4", name: "Cabuyao City Hall", description: "Wheelchair accessible entrance, wheelchair accessible parking lot.", coordinates: { latitude: 14.2717, longitude: 121.1244 }, type: "step-free" },
+    { id: "5", name: "Pamantasan ng Cabuyao", description: "Accessible pathways and elevators for PWDs.", coordinates: { latitude: 14.2595, longitude: 121.1338 }, type: "step-free" },
+    { id: "6", name: "St. Polycarp Parish Church", description: "Accessible pathways for PWDs and wheelchair users.", coordinates: { latitude: 14.2800, longitude: 121.1240 }, type: "step-free" },
   ];
 
-  const defaultLocation = { latitude: 14.5995, longitude: 120.9842 };
+  const defaultLocation = { latitude: 14.2786, longitude: 121.1251 };
 
   useEffect(() => {
     (async () => {
@@ -47,40 +50,77 @@ const AccessibilityScreen = ({ navigation }: any) => {
       }
 
       let currentLocation = await Location.getCurrentPositionAsync({});
-      setLocation(currentLocation.coords);
+      setLocation({
+        latitude: currentLocation.coords.latitude,
+        longitude: currentLocation.coords.longitude,
+      });
       setLoading(false);
     })();
   }, []);
 
+  const centerMapOnRoute = (coordinates: { latitude: number; longitude: number }) => {
+    if (mapRef.current) {
+      mapRef.current.animateToRegion(
+        {
+          ...coordinates,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        },
+        1000
+      );
+    }
+  };
+
+  const goToMyLocation = async () => {
+    let currentLocation = await Location.getCurrentPositionAsync({});
+    setLocation({
+      latitude: currentLocation.coords.latitude,
+      longitude: currentLocation.coords.longitude,
+    });
+
+    if (mapRef.current) {
+      mapRef.current.animateToRegion(
+        {
+          latitude: currentLocation.coords.latitude,
+          longitude: currentLocation.coords.longitude,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        },
+        1000
+      );
+    }
+  };
+
   return (
     <View style={styles.container}>
-      {/* Header */}
+      {/* Header with Back Button */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={28} color="white" />
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={30} color="white" />
         </TouchableOpacity>
-        <Text style={styles.title}>Accessible Routes</Text>
+        <Text style={styles.headerText}>Accessibility Routes</Text>
       </View>
 
-      {/* Map */}
+      {/* Map Section */}
       <View style={styles.mapContainer}>
         {loading ? (
           <ActivityIndicator size="large" color="#4CAF50" />
         ) : (
           <MapView
+            ref={mapRef}
             style={styles.map}
             initialRegion={{
               latitude: location ? location.latitude : defaultLocation.latitude,
               longitude: location ? location.longitude : defaultLocation.longitude,
-              latitudeDelta: 0.06,
-              longitudeDelta: 0.06,
+              latitudeDelta: 0.03,
+              longitudeDelta: 0.03,
             }}
           >
-            {/* Step-Free Routes Markers */}
-            {stepFreeRoutes.map((route) => (
+            {/* Render Markers */}
+            {routes.map((route) => (
               <Marker key={route.id} coordinate={route.coordinates}>
                 <View style={styles.marker}>
-                  <Ionicons name={route.icon} size={24} color="white" />
+                  <Ionicons name="accessibility" size={24} color="white" />
                 </View>
                 <Callout>
                   <Text style={{ fontWeight: "bold" }}>{route.name}</Text>
@@ -88,8 +128,7 @@ const AccessibilityScreen = ({ navigation }: any) => {
                 </Callout>
               </Marker>
             ))}
-
-            {/* User Location Marker */}
+            {/* User's Current Location */}
             {location && (
               <Marker coordinate={location} title="Your Location">
                 <Ionicons name="location-sharp" size={30} color="blue" />
@@ -99,103 +138,103 @@ const AccessibilityScreen = ({ navigation }: any) => {
         )}
       </View>
 
-      {/* Route List */}
-      <ScrollView style={styles.listContainer}>
+      {/* Floating Button to Go to Current Location */}
+      <TouchableOpacity style={styles.floatingButton} onPress={goToMyLocation}>
+        <Ionicons name="locate" size={30} color="white" />
+      </TouchableOpacity>
+
+      {/* Route List Section */}
+      <View style={styles.scrollContainer}>
+        <Text style={styles.listHeader}>Accessible Routes</Text>
         <FlatList
-          data={stepFreeRoutes}
+          data={routes}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <View style={styles.routeContainer}>
-              <Ionicons name={item.icon} size={20} color="#388E3C" style={{ marginRight: 10 }} />
-              <View>
-                <Text style={styles.routeText}>{item.name}</Text>
-                <Text style={styles.descriptionText}>{item.description}</Text>
+            <TouchableOpacity onPress={() => centerMapOnRoute(item.coordinates)}>
+              <View style={styles.routeCard}>
+                <Ionicons
+                  name="walk"
+                  size={24}
+                  color="#388E3C"
+                  style={{ marginRight: 10 }}
+                />
+                <View>
+                  <Text style={styles.routeName}>{item.name}</Text>
+                  <Text style={styles.routeDescription}>{item.description}</Text>
+                </View>
               </View>
-            </View>
+            </TouchableOpacity>
           )}
-          scrollEnabled={false} // Prevents conflicts with ScrollView
         />
-      </ScrollView>
-
-      {/* Emergency Assistance Button */}
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Emergency Assistance</Text>
-      </TouchableOpacity>
+      </View>
     </View>
   );
 };
 
+// Styles
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
-
   header: {
+    backgroundColor: "#4CAF50",
+    padding: 15,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#4CAF50",
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderBottomLeftRadius: 15,
-    borderBottomRightRadius: 15,
+    justifyContent: "center",  // Center content horizontally
   },
-  backButton: {
+  headerText: {
+    flex: 1, // Allows it to take up space and center properly
+    fontSize: 20,
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center", // Ensures text is centered
+  },
+  mapContainer: { flex: 2 },
+  map: { width: "100%", height: "100%" },
+  floatingButton: {
     position: "absolute",
-    left: 20,
+    bottom: 20,
+    right: 20,
+    backgroundColor: "#4CAF50",
+    padding: 15,
+    borderRadius: 50,
+    elevation: 5,
+    alignItems: "center",
+    justifyContent: "center",
     zIndex: 1,
   },
-  title: {
-    flex: 1,
-    fontSize: 22,
+  scrollContainer: { flex: 2, backgroundColor: "#E8F5E9" },
+  listHeader: {
+    fontSize: 18,
     fontWeight: "bold",
-    color: "white",
-    textAlign: "center",
+    color: "#2E7D32",
+    padding: 10,
+    textAlign: "left",
   },
-
-  mapContainer: {
-    width: "100%",
-    height: 250,
-    marginVertical: 10,
+  routeCard: {
+    backgroundColor: "#C8E6C9",
+    marginVertical: 5,
+    marginHorizontal: 10,
+    padding: 15,
     borderRadius: 10,
-    overflow: "hidden",
-  },
-  map: {
-    width: "100%",
-    height: "100%",
-  },
-
-  listContainer: { flex: 1, paddingHorizontal: 10, marginBottom: 10 },
-
-  routeContainer: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 12,
-    marginVertical: 6,
-    borderRadius: 10,
-    backgroundColor: "#E8F5E9",
-    borderWidth: 1,
-    borderColor: "#D0F1D7",
   },
-  routeText: { fontSize: 16, fontWeight: "bold", color: "#388E3C" },
-  descriptionText: { fontSize: 14, color: "#555" },
-
+  routeName: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#2E7D32",
+  },
+  routeDescription: {
+    fontSize: 14,
+    color: "#666",
+    flexWrap: "wrap", // Ensures text wraps within the container
+    maxWidth: "90%",
+  },
   marker: {
-    backgroundColor: "#4CAF50",
-    padding: 6,
+    padding: 5,
+    backgroundColor: "#388E3C",
     borderRadius: 10,
-    borderColor: "white",
-    borderWidth: 2,
-    justifyContent: "center",
-    alignItems: "center",
   },
-
-  button: {
-    backgroundColor: "#E53935",
-    padding: 12,
-    borderRadius: 10,
-    margin: 10,
-    alignItems: "center",
-    elevation: 3,
-  },
-  buttonText: { color: "#fff", fontSize: 18, fontWeight: "bold" },
 });
 
 export default AccessibilityScreen;

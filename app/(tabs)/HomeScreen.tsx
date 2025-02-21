@@ -189,7 +189,8 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
       <Ionicons name="add" size={28} color="#007AFF" />
     </View>
     <Text style={styles.quickText}>Add</Text>
-    <Text style={styles.quickSubText}> </Text> {/* Keeps alignment consistent */}
+    <Text style={styles?.quickSubText ?? { fontSize: 16 }}>_</Text>
+ {/* Keeps alignment consistent */}
   </TouchableOpacity>
 </View>
 
